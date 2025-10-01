@@ -1,0 +1,46 @@
+{
+  "meeting-test-001": {
+    "Jean Dupont": {
+      "totalConnectionDuration": 3600000,
+      "voteCount": 3,
+      "isConnected": false
+    },
+    "Marie Martin": {
+      "totalConnectionDuration": 2700000,
+      "voteCount": 2,
+      "isConnected": false
+    },
+    "Pierre Durand": {
+      "totalConnectionDuration": 4200000,
+      "voteCount": 4,
+      "isConnected": false
+    },
+    "Sophie Leroy": {
+      "totalConnectionDuration": 1800000,
+      "voteCount": 1,
+      "isConnected": false
+    }
+  },
+  "meeting-test-002": {
+    "Jean Dupont": {
+      "totalConnectionDuration": 5400000,
+      "voteCount": 5,
+      "isConnected": false
+    },
+    "Marie Martin": {
+      "totalConnectionDuration": 4800000,
+      "voteCount": 3,
+      "isConnected": false
+    },
+    "Paul Bernard": {
+      "totalConnectionDuration": 3300000,
+      "voteCount": 2,
+      "isConnected": false
+    },
+    "Claire Moreau": {
+      "totalConnectionDuration": 2100000,
+      "voteCount": 1,
+      "isConnected": false
+    }
+  }
+}

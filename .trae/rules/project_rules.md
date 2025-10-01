@@ -1,0 +1,1 @@
+A chaque nouvelle modification d'interface prend en compte qu'elle doit être entièrement responsive mobile.

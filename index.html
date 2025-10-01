@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menil App - Visioconférence Simple</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <img src="images/menil-panneau.png" alt="Menil App" class="header-logo">
+                </div>
+                <div class="header-center">
+                    <h1>RÉUNIONS<br>MUNICIPALES</h1>
+                    <img src="images/videocall.png" alt="Vidéoconférence" class="title-icon">
+                </div>
+                <div class="header-right">
+                    <button type="button" class="btn btn-outline admin-toggle-btn" onclick="toggleAdminMode()" title="Cliquez pour activer le mode administrateur">
+                        <i class="fas fa-user"></i>
+                        <span class="btn-text">Admin</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Section Réunions sauvegardées -->
+            <section class="card saved-meetings" id="savedMeetingsSection">
+                <div class="card-header">
+                    <h2><img src="images/round-table.png" alt="Table ronde" class="section-icon"> Prochaine(s) réunion(s)</h2>
+                </div>
+                <div class="card-body">
+                    <div id="savedMeetingsList" class="saved-meetings-list">
+                        <p class="no-meetings">Aucune réunion sauvegardée pour le moment.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Créer une réunion -->
+            <section class="card create-meeting" id="createMeetingSection">
+                <div class="card-header">
+                    <h2><i class="fas fa-plus-circle"></i> Créer une nouvelle réunion</h2>
+                </div>
+                <div class="card-body">
+                    <form id="createMeetingForm">
+                        <div class="form-group">
+                            <label for="meetingName">Nom de la réunion</label>
+                            <input type="text" id="meetingName" name="meetingName" placeholder="Ex: Réunion équipe marketing" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="meetingSubjects">Sujets à aborder</label>
+                            <textarea id="meetingSubjects" name="meetingSubjects" placeholder="Ex: Budget 2024, Nouveaux projets, Planning équipe..." rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="scheduledDate">Planifier pour une date/heure (optionnel)</label>
+                            <input type="datetime-local" id="scheduledDate" name="scheduledDate">
+                            <small class="form-help">Laisser vide pour démarrer immédiatement</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> Créer la réunion
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Section Réunions passées -->
+            <section class="card past-meetings" id="pastMeetingsSection">
+                <div class="card-header">
+                    <h2><i class="fas fa-archive"></i> Réunions passées</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Sélecteur de réunion -->
+                    <div class="meeting-selector">
+                        <label for="pastMeetingSelect">Sélectionner une réunion :</label>
+                        <select id="pastMeetingSelect" class="form-control">
+                            <option value="">Aucune réunion passée disponible</option>
+                        </select>
+                    </div>
+
+                    <div class="past-meetings-content" id="pastMeetingsContent" style="display: none;">
+                        <!-- Compte rendu de réunion -->
+                        <div class="meeting-report-section">
+                            <h3><i class="fas fa-file-alt"></i> Compte rendu de réunion</h3>
+                            <div class="report-buttons">
+                                <button id="pastMeetingReportBtn" class="btn btn-outline" style="display: none;">
+                                    <i class="fas fa-external-link-alt"></i> Voir le compte rendu
+                                </button>
+                                <button id="editReportBtn" class="btn btn-primary admin-only" style="display: none;" onclick="openReportEditModal()">
+                                    <i class="fas fa-edit"></i> Éditer le lien
+                                </button>
+                                <p id="noReportMessage" class="no-report" style="display: none;">Aucun compte rendu disponible pour cette réunion.</p>
+                            </div>
+                        </div>
+
+                        <!-- Historique des votes -->
+                        <div class="vote-history-section">
+                            <h3><i class="fas fa-vote-yea"></i> Historique des votes</h3>
+                            <div id="pastMeetingVoteHistory" class="past-votes-list">
+                                <p class="no-votes">Aucun vote dans l'historique.</p>
+                            </div>
+                        </div>
+
+                        <!-- Liste des participants -->
+                        <div class="participants-section">
+                            <h3><i class="fas fa-users"></i> Participants</h3>
+                            <div id="pastMeetingParticipants" class="participants-list">
+                                <p class="no-participants">Aucun participant enregistré.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Gestion des administrés (visible uniquement en mode admin) -->
+            <section class="card residents-management admin-only" id="residentsSection" style="display: none;">
+                <div class="card-header">
+                    <h2><i class="fas fa-users-cog"></i> Les administrés</h2>
+                </div>
+                <div class="card-body">
+                    <div class="residents-actions">
+                        <button id="manageResidentsBtn" class="btn btn-primary" onclick="openResidentsModal()">
+                            <i class="fas fa-list"></i> Consulter/Éditer la liste
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+        </main>
+
+        <!-- Modal pour la visioconférence -->
+        <div id="videoModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="header-left">
+                        <h3 id="modalTitle">Réunion en cours</h3>
+                    </div>
+                    <div class="header-center">
+                        <button type="button" id="voteBtn" class="btn btn-outline vote-btn-header" title="Système de vote">
+                            <i class="fas fa-vote-yea"></i>
+                            <span>Votes</span>
+                        </button>
+                        <button type="button" id="homeBtn" class="btn btn-outline home-btn-header" title="Retour à l'accueil" onclick="resetToHome()">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                    <div class="header-right">
+                        <button type="button" id="endMeetingBtn" class="btn btn-danger end-meeting-btn" onclick="endMeeting()" title="Finir la réunion" style="display: none;">
+                            <i class="fas fa-stop"></i>
+                            <span>Finir</span>
+                        </button>
+                        <button type="button" class="btn btn-outline admin-btn-header" onclick="toggleAdminMode()" title="Mode administrateur">
+                            <i class="fas fa-user-cog"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="videoContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour demander le nom d'utilisateur -->
+        <div id="userNameModal" class="modal">
+            <div class="modal-content user-name-modal">
+                <div class="modal-header">
+                    <h3 id="userNameModalTitle">Rejoindre la réunion</h3>
+                    <button type="button" id="closeUserNameModal" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="info-text">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Veuillez sélectionner votre nom dans la liste pour rejoindre la réunion et participer aux votes.</p>
+                    </div>
+                    <form id="userNameForm">
+                        <div class="form-group">
+                            <label for="userNameSelect">Sélectionnez votre nom *</label>
+                            <select id="userNameSelect" class="form-control" required>
+                                <option value="">Choisissez votre nom...</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancelUserName" class="btn btn-secondary">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Rejoindre</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour le système de vote -->
+        <div id="voteModal" class="modal">
+            <div class="modal-content vote-modal">
+                <div class="modal-header">
+                    <h3 id="voteModalTitle">Système de vote</h3>
+                    <button type="button" id="closeVoteModal" class="close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Onglets pour naviguer entre les sections -->
+                    <div class="vote-tabs">
+                        <button type="button" class="vote-tab active" data-tab="active-votes">
+                            <i class="fas fa-poll"></i>
+                            Votes actifs
+                        </button>
+                        <button type="button" class="vote-tab" data-tab="create-vote" id="createVoteTab">
+                            <i class="fas fa-plus"></i>
+                            Créer un vote
+                        </button>
+                        <button type="button" class="vote-tab" data-tab="vote-history">
+                            <i class="fas fa-history"></i>
+                            Historique
+                        </button>
+                    </div>
+
+                    <!-- Section des votes actifs -->
+                    <div id="active-votes" class="vote-section active">
+                        <div class="votes-list">
+                            <div class="empty-state">
+                                <i class="fas fa-vote-yea"></i>
+                                <h4>Aucun vote actif</h4>
+                                <p>Il n'y a actuellement aucun vote en cours pour cette réunion.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section de création de vote -->
+                    <div id="create-vote" class="vote-section">
+                        <form id="createVoteForm" class="create-vote-form">
+                            <div class="form-group">
+                                <label for="voteTitle">Titre du vote *</label>
+                                <input type="text" id="voteTitle" class="form-control" placeholder="Ex: Choix du lieu pour le prochain événement" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="voteDescription">Description (optionnelle)</label>
+                                <textarea id="voteDescription" class="form-control" rows="3" placeholder="Détails supplémentaires sur le vote..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Options de vote *</label>
+                                <div id="voteOptions" class="vote-options">
+                                    <div class="vote-option-input">
+                                        <input type="text" class="form-control option-input" placeholder="Option 1" required>
+                                        <button type="button" class="remove-option-btn default-option" style="display: none;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="vote-option-input">
+                                        <input type="text" class="form-control option-input" placeholder="Option 2" required>
+                                        <button type="button" class="remove-option-btn default-option" style="display: none;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="button" id="addOptionBtn" class="btn btn-outline">
+                                    <i class="fas fa-plus"></i>
+                                    Ajouter une option
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <label class="simple-checkbox-label">
+                                    <input type="checkbox" id="allowMultipleChoices">
+                                    Autoriser plusieurs choix
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="cancelCreateVote" class="btn btn-secondary">Annuler</button>
+                                <button type="submit" class="btn btn-primary">Créer le vote</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Section historique des votes -->
+                    <div id="vote-history" class="vote-section">
+                        <div class="votes-history-list">
+                            <div class="empty-state">
+                                <i class="fas fa-history"></i>
+                                <h4>Aucun historique</h4>
+                                <p>Aucun vote n'a encore été terminé dans cette réunion.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour ajouter/modifier le lien du compte rendu -->
+        <div id="reportLinkModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Ajouter/Modifier le lien du compte rendu</h3>
+                    <button type="button" class="close-btn" onclick="closeReportLinkModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportLinkForm">
+                        <div class="form-group">
+                            <label for="reportLinkInput">Lien vers le compte rendu</label>
+                            <input type="url" id="reportLinkInput" class="form-control" placeholder="https://docs.google.com/document/..." required>
+                            <small class="form-help">Lien vers Google Docs, Word Online, ou tout autre document</small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeReportLinkModal()">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour afficher la liste des participants -->
+        <div id="participantsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Liste des participants</h3>
+                    <button type="button" class="close-btn" onclick="closeParticipantsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="participantsList" class="participants-list">
+                        <p class="no-participants">Aucun participant enregistré.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour éditer le compte-rendu des réunions passées -->
+        <div id="reportEditModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Éditer le lien du compte rendu</h3>
+                    <button type="button" class="close-btn" onclick="closeReportEditModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="reportEditForm">
+                        <div class="form-group">
+                            <label for="reportEditInput">Lien vers le compte rendu</label>
+                            <input type="url" id="reportEditInput" class="form-control" placeholder="https://docs.google.com/document/..." required>
+                            <small class="form-help">Lien vers Google Docs, Word Online, ou tout autre document</small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeReportEditModal()">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour la gestion des administrés -->
+        <div id="residentsModal" class="modal residents-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Gestion des administrés</h3>
+                    <button type="button" class="close-btn" onclick="closeResidentsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Bouton d'ajout -->
+                    <div class="residents-header">
+                        <button id="addResidentBtn" class="btn btn-primary" onclick="showAddResidentForm()">
+                            <i class="fas fa-plus"></i> Ajouter un administré
+                        </button>
+                    </div>
+
+                    <!-- Formulaire d'ajout (masqué par défaut) -->
+                    <div id="addResidentForm" class="add-resident-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="newResidentInput">Nom et prénom</label>
+                            <textarea id="newResidentInput" class="form-control" placeholder="Dupont Marie" rows="3"></textarea>
+                            <small class="form-help">Pour ajouter plusieurs administrés d'un coup, tapez : nom prénom, nom prénom, etc.</small>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="hideAddResidentForm()">Annuler</button>
+                            <button type="button" class="btn btn-primary" onclick="addResidents()">Ajouter</button>
+                        </div>
+                    </div>
+
+                    <!-- Liste des administrés -->
+                    <div id="residentsList" class="residents-list">
+                        <div class="loading">Chargement des administrés...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour éditer un administré -->
+        <div id="editResidentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Éditer l'administré</h3>
+                    <button type="button" class="close-btn" onclick="closeEditResidentModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editResidentForm">
+                        <div class="form-group">
+                            <label for="editFirstName">Prénom</label>
+                            <input type="text" id="editFirstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editLastName">Nom</label>
+                            <input type="text" id="editLastName" class="form-control" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeEditResidentModal()">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2024 Menil App - Propulsé par <a href="https://mirotalk.com" target="_blank">MiroTalk</a></p>
+        </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script src="hide-share-popup.js"></script>
+</body>
+</html>
