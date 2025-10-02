@@ -1,0 +1,7 @@
+# Ignorer les fichiers Python (backend sur Railway)
+*.py
+requirements.txt
+Procfile
+data/
+__pycache__/
+*.pyc
