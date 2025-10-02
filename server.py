@@ -319,6 +319,45 @@ def save_participant_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# ===== ROUTES POUR LES RÉUNIONS PASSÉES =====
+
+@app.route('/api/past-meetings', methods=['GET'])
+def get_past_meetings():
+    """Récupérer toutes les réunions passées"""
+    try:
+        filepath = DATA_DIR / 'past_meetings.json'
+        if filepath.exists():
+            with open(filepath, 'r', encoding='utf-8') as f:
+                past_meetings = json.load(f)
+        else:
+            past_meetings = []
+        return jsonify(past_meetings)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/past-meetings', methods=['POST'])
+def save_past_meeting():
+    """Sauvegarder une réunion passée"""
+    try:
+        meeting_data = request.json
+        
+        filepath = DATA_DIR / 'past_meetings.json'
+        if filepath.exists():
+            with open(filepath, 'r', encoding='utf-8') as f:
+                past_meetings = json.load(f)
+        else:
+            past_meetings = []
+        
+        # Ajouter la nouvelle réunion passée
+        past_meetings.append(meeting_data)
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(past_meetings, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'meeting': meeting_data})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # ===== SERVIR LES FICHIERS STATIQUES =====
 
 @app.route('/')

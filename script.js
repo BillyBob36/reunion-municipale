@@ -2696,23 +2696,40 @@ async function endMeeting() {
 // Fonction pour sauvegarder une réunion passée
 async function savePastMeeting(meetingData) {
     try {
+        // Sauvegarder sur le serveur
+        const response = await fetch(`${API_BASE_URL}/api/past-meetings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(meetingData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de la sauvegarde sur le serveur');
+        }
+        
+        console.log('Réunion passée sauvegardée sur le serveur:', meetingData);
+        
+        // Fallback: sauvegarder aussi dans localStorage
         let pastMeetings = [];
         const stored = localStorage.getItem('pastMeetings');
         if (stored) {
             pastMeetings = JSON.parse(stored);
         }
-        
-        // Ajouter la nouvelle réunion passée
         pastMeetings.push(meetingData);
-        
-        // Sauvegarder dans le localStorage
         localStorage.setItem('pastMeetings', JSON.stringify(pastMeetings));
-        
-        console.log('Réunion passée sauvegardée:', meetingData);
         
     } catch (error) {
         console.error('Erreur lors de la sauvegarde de la réunion passée:', error);
-        throw error;
+        // En cas d'erreur serveur, sauvegarder quand même en local
+        let pastMeetings = [];
+        const stored = localStorage.getItem('pastMeetings');
+        if (stored) {
+            pastMeetings = JSON.parse(stored);
+        }
+        pastMeetings.push(meetingData);
+        localStorage.setItem('pastMeetings', JSON.stringify(pastMeetings));
     }
 }
 
@@ -2756,10 +2773,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // Fonction pour récupérer toutes les réunions passées
 async function getPastMeetings() {
     try {
+        // Récupérer depuis le serveur
+        const response = await fetch(`${API_BASE_URL}/api/past-meetings`);
+        
+        if (response.ok) {
+            const serverMeetings = await response.json();
+            console.log('Réunions passées chargées depuis le serveur:', serverMeetings.length);
+            
+            // Synchroniser avec localStorage
+            localStorage.setItem('pastMeetings', JSON.stringify(serverMeetings));
+            
+            return serverMeetings;
+        } else {
+            throw new Error('Erreur serveur');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des réunions passées depuis le serveur:', error);
+        // Fallback vers localStorage
         const stored = localStorage.getItem('pastMeetings');
         return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-        console.error('Erreur lors de la récupération des réunions passées:', error);
-        return [];
     }
 }
