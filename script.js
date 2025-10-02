@@ -2449,32 +2449,30 @@ function displayPastMeetingData(meeting) {
             const meetingStats = participantStats.get(meeting.id) || new Map();
             
             participantsContent.innerHTML = `
-                <div class="participants-list">
-                    ${meeting.participants.map(participant => {
-                        const stats = meetingStats.get(participant) || { totalConnectionDuration: 0, voteCount: 0 };
-                        const connectionTime = formatDuration(stats.totalConnectionDuration);
-                        
-                        return `
-                            <div class="participant-item">
-                                <div class="participant-info">
-                                    <i class="fas fa-user"></i>
-                                    <span class="participant-name">${participant}</span>
-                                </div>
-                                <div class="participant-stats">
-                                    <div class="stat-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span class="stat-label">Temps de connexion:</span>
-                                        <span class="stat-value">${connectionTime}</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i class="fas fa-vote-yea"></i>
-                                        <span class="stat-label">Votes:</span>
-                                        <span class="stat-value">${stats.voteCount}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                <div class="participants-table-container">
+                    <table class="participants-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> Nom</th>
+                                <th><i class="fas fa-clock"></i> Temps</th>
+                                <th><i class="fas fa-vote-yea"></i> Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${meeting.participants.map(participant => {
+                                const stats = meetingStats.get(participant) || { totalConnectionDuration: 0, voteCount: 0 };
+                                const connectionTime = formatDuration(stats.totalConnectionDuration);
+                                
+                                return `
+                                    <tr>
+                                        <td class="participant-name">${participant}</td>
+                                        <td class="participant-time">${connectionTime}</td>
+                                        <td class="participant-votes">${stats.voteCount}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
                 </div>
             `;
         } else {

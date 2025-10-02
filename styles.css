@@ -547,6 +547,106 @@ body {
     font-size: var(--font-size-sm);
 }
 
+/* ===== TABLEAU DES PARTICIPANTS ===== */
+.participants-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: var(--background-tertiary);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--shadow-light);
+}
+
+.participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.participants-table thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.participants-table th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.participants-table th i {
+    margin-right: var(--spacing-xs);
+    opacity: 0.9;
+}
+
+.participants-table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background-color 0.2s ease;
+}
+
+.participants-table tbody tr:hover {
+    background-color: var(--background-secondary);
+}
+
+.participants-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.participants-table td {
+    padding: var(--spacing-md);
+    color: var(--text-secondary);
+}
+
+.participants-table .participant-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.participants-table .participant-time {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.participants-table .participant-votes {
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .participants-table {
+        font-size: var(--font-size-xs);
+    }
+    
+    .participants-table th,
+    .participants-table td {
+        padding: var(--spacing-sm);
+    }
+    
+    .participants-table th {
+        font-size: var(--font-size-xs);
+    }
+    
+    /* Réduire la taille des icônes sur mobile */
+    .participants-table th i {
+        font-size: 10px;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 480px) {
+    .participants-table th,
+    .participants-table td {
+        padding: 6px 8px;
+    }
+    
+    .participants-table .participant-name {
+        font-size: var(--font-size-xs);
+    }
+}
+
 .stat-item i {
     color: var(--text-tertiary);
     width: 14px;
