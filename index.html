@@ -80,9 +80,14 @@
                     <!-- Sélecteur de réunion -->
                     <div class="meeting-selector">
                         <label for="pastMeetingSelect">Sélectionner une réunion :</label>
-                        <select id="pastMeetingSelect" class="form-control">
-                            <option value="">Aucune réunion passée disponible</option>
-                        </select>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="pastMeetingSelect" class="form-control" style="flex: 1;">
+                                <option value="">Aucune réunion passée disponible</option>
+                            </select>
+                            <button id="deletePastMeetingBtn" class="btn btn-danger admin-only" style="display: none;" onclick="deletePastMeeting()" title="Supprimer cette réunion">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="past-meetings-content" id="pastMeetingsContent" style="display: none;">
