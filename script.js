@@ -26,6 +26,17 @@ function initializeAdminMode() {
 
 // Basculer le mode administrateur
 function toggleAdminMode() {
+    // Si on veut activer le mode admin, demander le mot de passe
+    if (!isAdminMode) {
+        const password = prompt('Entrez le mot de passe administrateur :');
+        
+        // Vérifier le mot de passe
+        if (password !== 'meniL-admin') {
+            showError('Mot de passe incorrect');
+            return;
+        }
+    }
+    
     isAdminMode = !isAdminMode;
     localStorage.setItem('menilapp_admin_mode', isAdminMode.toString());
     updateAdminUI();
