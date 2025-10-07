@@ -2304,7 +2304,12 @@ function updatePastMeetingsUI() {
     if (isAdminMode) {
         if (addReportLinkBtn) addReportLinkBtn.style.display = 'inline-block';
         if (editReportBtn) editReportBtn.style.display = 'inline-block';
-        if (deletePastMeetingBtn) deletePastMeetingBtn.style.display = 'inline-block';
+        // Le bouton supprimer n'apparaît que si une réunion est sélectionnée
+        if (deletePastMeetingBtn && pastMeetingSelect && pastMeetingSelect.value) {
+            deletePastMeetingBtn.style.display = 'inline-block';
+        } else if (deletePastMeetingBtn) {
+            deletePastMeetingBtn.style.display = 'none';
+        }
     } else {
         if (addReportLinkBtn) addReportLinkBtn.style.display = 'none';
         if (editReportBtn) editReportBtn.style.display = 'none';
@@ -2346,11 +2351,20 @@ async function loadPastMeetingsSelector() {
 function handlePastMeetingSelection() {
     const pastMeetingSelect = document.getElementById('pastMeetingSelect');
     const selectedMeetingId = pastMeetingSelect.value;
+    const deletePastMeetingBtn = document.getElementById('deletePastMeetingBtn');
     
     if (selectedMeetingId) {
         loadSelectedPastMeeting(selectedMeetingId);
+        // Afficher le bouton supprimer si admin et réunion sélectionnée
+        if (deletePastMeetingBtn && isAdminMode) {
+            deletePastMeetingBtn.style.display = 'inline-block';
+        }
     } else {
         clearPastMeetingDisplay();
+        // Masquer le bouton supprimer si aucune réunion sélectionnée
+        if (deletePastMeetingBtn) {
+            deletePastMeetingBtn.style.display = 'none';
+        }
     }
 }
 
