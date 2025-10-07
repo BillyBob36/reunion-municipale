@@ -2293,6 +2293,7 @@ function updatePastMeetingsUI() {
     const addReportLinkBtn = document.getElementById('addReportLinkBtn');
     const meetingReportBtn = document.getElementById('meetingReportBtn');
     const editReportBtn = document.getElementById('editReportBtn');
+    const deletePastMeetingBtn = document.getElementById('deletePastMeetingBtn');
     
     // Charger les réunions passées dans le sélecteur
     if (pastMeetingSelect) {
@@ -2303,9 +2304,11 @@ function updatePastMeetingsUI() {
     if (isAdminMode) {
         if (addReportLinkBtn) addReportLinkBtn.style.display = 'inline-block';
         if (editReportBtn) editReportBtn.style.display = 'inline-block';
+        if (deletePastMeetingBtn) deletePastMeetingBtn.style.display = 'inline-block';
     } else {
         if (addReportLinkBtn) addReportLinkBtn.style.display = 'none';
         if (editReportBtn) editReportBtn.style.display = 'none';
+        if (deletePastMeetingBtn) deletePastMeetingBtn.style.display = 'none';
     }
     
     if (meetingReportLink && meetingReportBtn) {
@@ -2790,5 +2793,56 @@ async function getPastMeetings() {
         // Fallback vers localStorage
         const stored = localStorage.getItem('pastMeetings');
         return stored ? JSON.parse(stored) : [];
+    }
+}
+
+// Fonction pour supprimer une réunion passée (admin uniquement)
+async function deletePastMeeting() {
+    if (!isAdminMode) {
+        showError('Cette action nécessite les droits administrateur');
+        return;
+    }
+    
+    const pastMeetingSelect = document.getElementById('pastMeetingSelect');
+    const meetingId = pastMeetingSelect?.value;
+    
+    if (!meetingId) {
+        showError('Veuillez sélectionner une réunion à supprimer');
+        return;
+    }
+    
+    // Demander confirmation
+    const meetingName = pastMeetingSelect.options[pastMeetingSelect.selectedIndex].text;
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer la réunion "${meetingName}" et toutes ses données associées (votes, statistiques, compte-rendu) ?\n\nCette action est irréversible.`)) {
+        return;
+    }
+    
+    try {
+        // Supprimer via l'API
+        const response = await fetch(`${API_BASE_URL}/api/past-meetings/${meetingId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de la suppression');
+        }
+        
+        showNotification('Réunion et données associées supprimées avec succès', 'success');
+        
+        // Recharger la liste des réunions passées
+        await loadPastMeetingsSelector();
+        
+        // Effacer l'affichage
+        clearPastMeetingDisplay();
+        
+        // Masquer le contenu
+        const pastMeetingsContent = document.getElementById('pastMeetingsContent');
+        if (pastMeetingsContent) {
+            pastMeetingsContent.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la réunion:', error);
+        showError('Erreur lors de la suppression de la réunion');
     }
 }

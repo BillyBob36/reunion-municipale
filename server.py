@@ -358,6 +358,60 @@ def save_past_meeting():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/past-meetings/<meeting_id>', methods=['DELETE'])
+def delete_past_meeting(meeting_id):
+    """Supprimer une réunion passée et ses données associées"""
+    try:
+        # Supprimer la réunion passée
+        filepath = DATA_DIR / 'past_meetings.json'
+        if filepath.exists():
+            with open(filepath, 'r', encoding='utf-8') as f:
+                past_meetings = json.load(f)
+            
+            past_meetings = [m for m in past_meetings if m.get('id') != meeting_id]
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(past_meetings, f, ensure_ascii=False, indent=2)
+        
+        # Supprimer les votes associés
+        votes_filepath = DATA_DIR / 'votes.json'
+        if votes_filepath.exists():
+            with open(votes_filepath, 'r', encoding='utf-8') as f:
+                votes = json.load(f)
+            
+            votes = [v for v in votes if v.get('meetingId') != meeting_id]
+            
+            with open(votes_filepath, 'w', encoding='utf-8') as f:
+                json.dump(votes, f, ensure_ascii=False, indent=2)
+        
+        # Supprimer les statistiques participants
+        stats_filepath = DATA_DIR / 'participant_stats.json'
+        if stats_filepath.exists():
+            with open(stats_filepath, 'r', encoding='utf-8') as f:
+                stats = json.load(f)
+            
+            if meeting_id in stats:
+                del stats[meeting_id]
+            
+            with open(stats_filepath, 'w', encoding='utf-8') as f:
+                json.dump(stats, f, ensure_ascii=False, indent=2)
+        
+        # Supprimer le compte-rendu
+        reports_filepath = DATA_DIR / 'reports.json'
+        if reports_filepath.exists():
+            with open(reports_filepath, 'r', encoding='utf-8') as f:
+                reports = json.load(f)
+            
+            if meeting_id in reports:
+                del reports[meeting_id]
+            
+            with open(reports_filepath, 'w', encoding='utf-8') as f:
+                json.dump(reports, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({'success': True, 'message': 'Réunion et données associées supprimées'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # ===== SERVIR LES FICHIERS STATIQUES =====
 
 @app.route('/')
