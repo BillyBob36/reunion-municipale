@@ -1,3 +1,4 @@
-// Configuration injectée automatiquement par Netlify
-// Cette variable sera remplacée lors du build
-window.API_URL = 'https://web-production-9a2fc7.up.railway.app';
+// Configuration de l'URL du backend
+// IMPORTANT: Remplacer cette URL par votre URL Render après déploiement
+// Format: https://[votre-nom-service].onrender.com
+window.API_URL = 'https://menil-app-backend.onrender.com';
